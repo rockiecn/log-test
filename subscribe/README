@@ -1,0 +1,29 @@
+usage example:
+
+wy@wy:~/work/log-test/subscribe$ ./subscribe
+dialing..
+subscribing..
+print..
+{0xb069d34acDE5F177ab2b21759f54972a63234F3f [0xe22ccfc11bbbb1d3350012248b26ad616e32a8a13eece408dd14f1953fe24752] [0 0 0 0 0 0 0 0 0 0 0 0 30 146 232 57 219 138 24 66 205 103 65 184 133 71 27 178 95 197 38 120 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 99] 2090234 0x83b0a0d6c38c0a0d33786bde725d6a7fc96b3a79919be52cdb11cc8e608f4f4c 1 0xbb5ea6c082ef0f303e6e9af515d556bb57c33d2a50c8a8d2af702aa69dfd5fbd 1 false}
+{0xb069d34acDE5F177ab2b21759f54972a63234F3f [0x5550fbab402c3b014955818e5b6e3cefef20641aa6bed43ae83cd5d3258b8922 0x0000000000000000000000000000000000000000000000000000000000000001] [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 99] 2090240 0x523ac0fe38ca351bd2adfc900c6d2827e6c7e22fc94470ddafa5aee670c750c4 1 0x77234c2bda2a0e2167f4ae949d6c05141d00d8c07ebde9027a2b94a7ccb8f316 2 false}
+{0xb069d34acDE5F177ab2b21759f54972a63234F3f [0xe7329265e8e4e2fc8e892a75f1809767d09c472bb2eef16f889eceb5583291a9 0x0000000000000000000000000000000000000000000000000000000000000001] [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 99] 2090243 0x80c9b428e8f7502f544cf056a4fc507af8a1c6ebf2b6378d9a6295aa40310dea 0 0x6714389fd73e748803ace4af363a1e7f0b57d5d43c5e29930fa73c1f37484ec7 0 false}
+
+
+This program subscribes all events in Role contract. Here I start a new user node, it generated 3 events showed above.
+
+Role contract's address is: 0xb069d34acDE5F177ab2b21759f54972a63234F3f
+User's address is: 0x1e92e839DB8A1842cd6741B885471BB25FC52678
+User index is: 99
+Role type is: 1
+Gindex is: 1
+
+The first event is:
+event ReAcc(address addr, uint64 index); // to get all registered account by filter logs
+
+The second event is:
+event ReRole(uint8 indexed rType, uint64 index); // to get all users/keepers/providers by filter logs
+
+The third event is:
+event SetG(uint64 indexed gi, uint64 index); // to get all accounts in one group by filter logs
+
+
