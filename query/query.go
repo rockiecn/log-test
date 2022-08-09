@@ -10,42 +10,50 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	role "github.com/rockiecn/log-test/query/contracts" // for demo
+	erc "github.com/rockiecn/log-test/query/contracts" // for demo
 )
 
 func main() {
-	client, err := ethclient.Dial("wss://devchain.metamemo.one:6901")
+	client, err := ethclient.Dial("https://testchain.metamemo.one:24180")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	contractAddress := common.HexToAddress("0x393ee8b2726E144eB0AB056636f38358719dF17E")
+	// erc20 token address
+	contractAddress := common.HexToAddress("0x37aC6152B689EBEBdF311710ca541B2413777b7d")
+	// create a query
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(0),
-		ToBlock:   big.NewInt(8622),
+		ToBlock:   big.NewInt(8228622),
 		Addresses: []common.Address{
 			contractAddress,
 		},
 	}
 
+	// filter logs
 	logs, err := client.FilterLogs(context.Background(), query)
 	if err != nil {
 		log.Fatal(err)
 	}
 	println("logs length:", len(logs))
 
-	contractAbi, err := abi.JSON(strings.NewReader(string(role.IRoleSetterABI)))
+	// get contract abi
+	contractAbi, err := abi.JSON(strings.NewReader(string(erc.ERC20ABI)))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, vLog := range logs {
-		fmt.Println(vLog.BlockHash.Hex()) // 0x3404b8c050aa0aacd0223e91b5c32fee6400f357764771d0684fa7b3f448f1a8
-		fmt.Println(vLog.BlockNumber)     // 2394201
-		fmt.Println(vLog.TxHash.Hex())    // 0x280201eda63c9ff6f305fcee51d5eb86167fab40ca3108ec784e8652a0e2b1a6
+	totalInssue := new(big.Int)
+
+	// tranvel each log
+	fmt.Println("Travelling logs")
+	for i, vLog := range logs {
+		fmt.Println("log index:", i)
+		fmt.Println("block hash:", vLog.BlockHash.Hex()) // 0x3404b8c050aa0aacd0223e91b5c32fee6400f357764771d0684fa7b3f448f1a8
+		fmt.Println("block number:", vLog.BlockNumber)   // 2394201
+		fmt.Println("tx hash:", vLog.TxHash.Hex())       // 0x280201eda63c9ff6f305fcee51d5eb86167fab40ca3108ec784e8652a0e2b1a6
 
 		// event := struct {
 		// 	Key   [32]byte
@@ -57,26 +65,44 @@ func main() {
 		// 	Index [64]byte
 		// }{}
 
-		res, err := contractAbi.Unpack("ReAcc", vLog.Data)
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		// fmt.Println(string(event.Addr[:]))  // foo
 		// fmt.Println(string(event.Index[:])) // bar
 
-		fmt.Println(res[0])
-		fmt.Println(res[1])
-
-		var topics [4]string
+		// 3 topics in all, the first is the hash of the event
+		fmt.Println("get topics")
+		topics := make([]string, 3)
 		for i := range vLog.Topics {
 			topics[i] = vLog.Topics[i].Hex()
+			fmt.Printf("topic %d: %s\n", i, topics[i])
 		}
 
-		fmt.Println(topics[0]) // 0xe79e73da417710ae99aa2088575580a60415d359acfad9cdd3382d59c80281d4
+		// unpack log data
+		fmt.Println("unpacking data")
+		res, err := contractAbi.Unpack("Transfer", vLog.Data)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// only 1 data in Transfer event
+		fmt.Println("data:", res[0])
+
+		// find the issue event, aggregate the total issue
+		cmp := strings.Compare(topics[1], "0x0000000000000000000000000000000000000000000000000000000000000000")
+		if cmp == 0 {
+			issu, ok := res[0].(*big.Int)
+			if !ok {
+				log.Fatal("res assertion failed")
+			}
+			fmt.Println("issue this time:", issu.String())
+
+			// aggregate
+			totalInssue = totalInssue.Add(totalInssue, issu)
+		}
+		fmt.Println()
 	}
 
-	eventSignature := []byte("ReAcc(address,uint64)")
-	hash := crypto.Keccak256Hash(eventSignature)
-	fmt.Println(hash.Hex()) // 0xe79e73da417710ae99aa2088575580a60415d359acfad9cdd3382d59c80281d4
+	fmt.Println("total issue:", totalInssue)
+
+	// eventSignature := []byte("Transfer(address indexed, address indexed, uint256)")
+	// hash := crypto.Keccak256Hash(eventSignature)
+	// fmt.Println("event hash:", hash.Hex()) // 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
 }
