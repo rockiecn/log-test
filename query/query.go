@@ -50,53 +50,55 @@ func main() {
 	// tranvel each log
 	fmt.Println("Travelling logs")
 	for i, vLog := range logs {
-		fmt.Println("log index:", i)
-		fmt.Println("block hash:", vLog.BlockHash.Hex()) // 0x3404b8c050aa0aacd0223e91b5c32fee6400f357764771d0684fa7b3f448f1a8
-		fmt.Println("block number:", vLog.BlockNumber)   // 2394201
-		fmt.Println("tx hash:", vLog.TxHash.Hex())       // 0x280201eda63c9ff6f305fcee51d5eb86167fab40ca3108ec784e8652a0e2b1a6
+		// fmt.Println("log index:", i)
+		// fmt.Println("block hash:", vLog.BlockHash.Hex()) // 0x3404b8c050aa0aacd0223e91b5c32fee6400f357764771d0684fa7b3f448f1a8
+		// fmt.Println("block number:", vLog.BlockNumber)   // 2394201
+		// fmt.Println("tx hash:", vLog.TxHash.Hex())       // 0x280201eda63c9ff6f305fcee51d5eb86167fab40ca3108ec784e8652a0e2b1a6
 
 		// event := struct {
 		// 	Key   [32]byte
 		// 	Value [32]byte
 		// }{}
 
-		// event := struct {
-		// 	Addr  [32]byte
-		// 	Index [64]byte
-		// }{}
-
 		// fmt.Println(string(event.Addr[:]))  // foo
 		// fmt.Println(string(event.Index[:])) // bar
 
 		// 3 topics in all, the first is the hash of the event
-		fmt.Println("get topics")
 		topics := make([]string, 3)
 		for i := range vLog.Topics {
 			topics[i] = vLog.Topics[i].Hex()
-			fmt.Printf("topic %d: %s\n", i, topics[i])
 		}
 
 		// unpack log data
-		fmt.Println("unpacking data")
 		res, err := contractAbi.Unpack("Transfer", vLog.Data)
 		if err != nil {
 			log.Fatal(err)
 		}
 		// only 1 data in Transfer event
-		fmt.Println("data:", res[0])
+		//fmt.Println("data:", res[0])
 
 		// find the issue event, aggregate the total issue
 		cmp := strings.Compare(topics[1], "0x0000000000000000000000000000000000000000000000000000000000000000")
 		if cmp == 0 {
+			fmt.Println("---- log index:", i)
+			fmt.Println("block number:", vLog.BlockNumber) // 2490757
+			for i := range vLog.Topics {
+				fmt.Printf("topic %d: %s\n", i, topics[i])
+			}
+
+			// one time issue
 			issu, ok := res[0].(*big.Int)
 			if !ok {
 				log.Fatal("res assertion failed")
 			}
 			fmt.Println("issue this time:", issu.String())
 
-			// aggregate
+			// accumulate
 			totalInssue = totalInssue.Add(totalInssue, issu)
+		} else {
+			continue
 		}
+
 		fmt.Println()
 	}
 
