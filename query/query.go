@@ -22,7 +22,12 @@ func main() {
 	}
 
 	// erc20 token address
-	contractAddress := common.HexToAddress("0x37aC6152B689EBEBdF311710ca541B2413777b7d")
+	// round 1:
+	//contractAddress := common.HexToAddress("0x37aC6152B689EBEBdF311710ca541B2413777b7d")
+
+	// round 2:
+	contractAddress := common.HexToAddress("0x9Ca0f1A85795ea800Ae3F8ed53e174297fbe4c6b")
+
 	// create a query
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(0),
@@ -45,7 +50,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	totalInssue := new(big.Int)
+	totalIssue := new(big.Int)
 
 	// tranvel each log
 	fmt.Println("Travelling logs")
@@ -92,7 +97,7 @@ func main() {
 			fmt.Println("issue this time:", issu.String())
 
 			// accumulate
-			totalInssue = totalInssue.Add(totalInssue, issu)
+			totalIssue = totalIssue.Add(totalIssue, issu)
 		} else {
 			continue
 		}
@@ -100,7 +105,7 @@ func main() {
 		fmt.Println()
 	}
 
-	fmt.Println("total issue:", totalInssue)
+	fmt.Println("total issue:", totalIssue)
 
 	// eventSignature := []byte("Transfer(address indexed, address indexed, uint256)")
 	// hash := crypto.Keccak256Hash(eventSignature)
