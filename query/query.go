@@ -11,13 +11,15 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+
 	// for demo
+	"github.com/rockiecn/log-test/query/contracts/erc"
 )
 
 func main() {
 
-	client, err := ethclient.Dial("https://devchain.metamemo.one:8501")
-	//client, err := ethclient.Dial("https://testchain.metamemo.one:24180")
+	//client, err := ethclient.Dial("https://devchain.metamemo.one:8501")
+	client, err := ethclient.Dial("https://testchain.metamemo.one:24180")
 	if err != nil {
 		log.Fatal(err)
 	}
