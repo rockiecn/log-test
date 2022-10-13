@@ -11,15 +11,23 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-
-	erc "github.com/rockiecn/log-test/query/contracts" // for demo
+	// for demo
 )
 
 func main() {
-	client, err := ethclient.Dial("https://testchain.metamemo.one:24180")
+
+	client, err := ethclient.Dial("https://devchain.metamemo.one:8501")
+	//client, err := ethclient.Dial("https://testchain.metamemo.one:24180")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	ctx := context.Background()
+	bn, err := client.BlockNumber(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("chain's latest block number:", bn)
 
 	// erc20 token address
 	// round 1:
@@ -85,6 +93,7 @@ func main() {
 		if cmp == 0 {
 			fmt.Println("---- log index:", i)
 			fmt.Println("block number:", vLog.BlockNumber) // 2490757
+			fmt.Println("txHash:", vLog.TxHash)
 			for i := range vLog.Topics {
 				fmt.Printf("topic %d: %s\n", i, topics[i])
 			}
@@ -110,4 +119,5 @@ func main() {
 	// eventSignature := []byte("Transfer(address indexed, address indexed, uint256)")
 	// hash := crypto.Keccak256Hash(eventSignature)
 	// fmt.Println("event hash:", hash.Hex()) // 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
+
 }
