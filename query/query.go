@@ -32,18 +32,14 @@ func main() {
 	fmt.Println("chain's latest block number:", bn)
 
 	// erc20 token address
-	// round 1:
-	//contractAddress := common.HexToAddress("0x37aC6152B689EBEBdF311710ca541B2413777b7d")
-
-	// round 2:
-	contractAddress := common.HexToAddress("0x9Ca0f1A85795ea800Ae3F8ed53e174297fbe4c6b")
+	erc20Address := common.HexToAddress("0xf3783070Ffe8eDd3C7F89bc136ba7c0512F18627")
 
 	// create a query
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(0),
 		ToBlock:   big.NewInt(8228622),
 		Addresses: []common.Address{
-			contractAddress,
+			erc20Address,
 		},
 	}
 
@@ -55,7 +51,7 @@ func main() {
 	println("logs length:", len(logs))
 
 	// get contract abi
-	contractAbi, err := abi.JSON(strings.NewReader(string(erc.ERC20ABI)))
+	erc20Abi, err := abi.JSON(strings.NewReader(string(erc.ERC20ABI)))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +79,7 @@ func main() {
 		}
 
 		// unpack log data
-		res, err := contractAbi.Unpack("Transfer", vLog.Data)
+		res, err := erc20Abi.Unpack("Transfer", vLog.Data)
 		if err != nil {
 			log.Fatal(err)
 		}
