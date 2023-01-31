@@ -127,9 +127,4 @@ func main() {
 	}
 
 	fmt.Println("total issue:", totalIssue)
-
-	// eventSignature := []byte("Transfer(address indexed, address indexed, uint256)")
-	// hash := crypto.Keccak256Hash(eventSignature)
-	// fmt.Println("event hash:", hash.Hex()) // 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
-
 }

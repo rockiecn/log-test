@@ -40,7 +40,7 @@ func main() {
 
 	// create a query
 	query := ethereum.FilterQuery{
-		FromBlock: big.NewInt(0),
+		FromBlock: big.NewInt(3757169),
 		ToBlock:   big.NewInt(3945936),
 		Addresses: []common.Address{
 			issuAddress,
